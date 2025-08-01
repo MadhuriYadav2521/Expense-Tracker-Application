@@ -14,8 +14,8 @@ const Loader = () => {
         position: 'fixed',
         top: 0,
         left: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.4)', // more transparent
-        backdropFilter: 'blur(0px)', // adds soft blur to background
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        backdropFilter: 'blur(2px)',
         zIndex: 9999,
       }}
     >
@@ -23,10 +23,10 @@ const Loader = () => {
         <Box
           key={i}
           sx={{
-            width: 12,
-            height: 12,
+            width: 14,
+            height: 14,
             borderRadius: '50%',
-            backgroundColor: '#FF5533',
+            background: 'linear-gradient(to bottom, #db2777, #ef4444, #f97316)',
             animation: 'bounce 0.6s infinite',
             animationDelay: `${i * 0.2}s`,
             '@keyframes bounce': {

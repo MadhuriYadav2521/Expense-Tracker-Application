@@ -24,10 +24,10 @@ export const register = async (req, res) => {
             name, email, password: hashedPassword
         })
         await newUser.save()
-        return res.status(200).json({ status: 200, message: "Registration successful.", success: true })
+        return res.status(200).json({ status: 200, message: "Sign up successful!", success: true })
 
     } catch (error) {
-        console.log("error in register:", error);
+        console.log("error in sign up:", error);
         return res.status(500).json({ status: 500, message: "Internal server error." })
 
     }
@@ -35,6 +35,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
+        
         const { email, password } = req.body
         if (!email || !password) return res.status(400).json({ status: 400, message: "All fields are required.", success: false })
 
@@ -55,11 +56,11 @@ export const login = async (req, res) => {
 
         const jwtToken = await jwt.sign(tokenData, process.env.JWT_TOKEN)
 
-        return res.status(200).json({ status: 200, message: "Login successful.", success: true, jwtToken })
+        return res.status(200).json({ status: 200, message: "Signed in successfully!", success: true, jwtToken })
 
 
     } catch (error) {
-        console.log("error in login:", error);
+        console.log("error in sign in:", error);
         return res.status(500).json({ status: 500, message: "Internal server error." })
 
     }
@@ -73,7 +74,7 @@ export const currentUser = async (req, res) => {
         return res.status(200).json({status: 200, message: "Fetched current user.", success: true, userData})
 
     } catch (error) {
-        console.log("error in login:", error);
+        console.log("error in fetch current user:", error);
         return res.status(500).json({ status: 500, message: "Internal server error." })
 
     }

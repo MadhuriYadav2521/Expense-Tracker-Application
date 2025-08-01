@@ -3,6 +3,8 @@ import { TextField, Button, Box, Typography, Paper } from "@mui/material";
 import axios from "axios"
 import Loader from "./Loader";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify'
+import { RegisterAxios } from "../services/userService";
 
 const Register = () => {
     const [formData, setFormData] = React.useState({
@@ -23,12 +25,12 @@ const Register = () => {
         e.preventDefault();
         try {
             setLoading(true)
-            const response = await axios.post("http://localhost:8000/users/register", formData)
+            const response = await RegisterAxios(formData)
             console.log(response, "resss");
             if (response.data.success == true) {
                 setLoading(false)
                 setFormData({ name: "", email: "", password: "" })
-                alert(response.data.message)
+                toast.success(response.data.message)
                 navigate('/')
             }
 
@@ -36,9 +38,9 @@ const Register = () => {
             setLoading(false)
             console.log(error);
             if (error.response) {
-                alert(error.response.data.message || "Something went wrong.");
+                toast.error(error.response.data.message || "Something went wrong.");
             } else {
-                alert("Internal server error.");
+                toast.error("Internal server error.");
             }
         }
 
@@ -53,7 +55,9 @@ const Register = () => {
                 justifyContent="center"
                 alignItems="center"
                 minHeight="100vh"
-                bgcolor="#FF775C"
+                sx={{
+                    background: "linear-gradient(to bottom, #db2777, #ef4444, #f97316)",
+                }}
                 px={2}
             >
                 <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: "100%" }}>
@@ -62,10 +66,12 @@ const Register = () => {
 
                             fontWeight: "bold",
                             fontSize: "24px",
-                            color: "#FF5533"
+                            background: "linear-gradient(to bottom, #db2777, #ef4444, #f97316)",
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
                         }}
                     >
-                        Register
+                        Sign Up
                     </Typography>
                     <form onSubmit={handleSubmit}>
                         <TextField
@@ -75,7 +81,6 @@ const Register = () => {
                             value={formData.name}
                             onChange={handleChange}
                             margin="normal"
-                            required
                             inputProps={{
                                 style: {
                                     textTransform: 'capitalize'
@@ -90,7 +95,6 @@ const Register = () => {
                             value={formData.email}
                             onChange={handleChange}
                             margin="normal"
-                            required
                         />
                         <TextField
                             fullWidth
@@ -100,7 +104,6 @@ const Register = () => {
                             value={formData.password}
                             onChange={handleChange}
                             margin="normal"
-                            required
                         />
                         <Button
                             type="submit"
@@ -122,14 +125,16 @@ const Register = () => {
                             <Box
                                 component="span"
                                 sx={{
-                                    color: '#FF5533',
+                                    background: "linear-gradient(to bottom, #db2777, #ef4444, #f97316)",
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
                                     fontWeight: 'bold',
                                     cursor: 'pointer',
                                     textDecoration: 'underline',
                                 }}
                                 onClick={() => navigate('/')}
                             >
-                                Login
+                                Sign In
                             </Box>
                         </Typography>
 
