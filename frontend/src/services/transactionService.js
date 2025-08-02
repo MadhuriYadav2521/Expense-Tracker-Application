@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000/transactions";
+const BASE_URL = "https://expense-tracker-application-s09e.onrender.com/transactions";
 
 export const AddTransactionAxios = async (data) => {
     try {
