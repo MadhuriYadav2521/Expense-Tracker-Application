@@ -50,7 +50,6 @@ const AddTransaction = () => {
         try {
             setLoading(true)
             const response = await AddTransactionAxios(form)
-            console.log(response, "resss");
             if (response.data.success == true) {
                 setLoading(false)
                 dispatch(setTransactionAdded(true));

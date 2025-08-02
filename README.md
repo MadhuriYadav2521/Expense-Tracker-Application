@@ -6,6 +6,10 @@ A full-stack Expense Tracker app that allows users to **add**, **view**, **delet
 ## 🧾 Objective
 Build a user-friendly application with a RESTful backend and dynamic frontend UI to track and analyze financial transactions.
 
+## 🚀 Live Demo
+
+- Frontend (Vercel): [View Site](https://expense-tracker-application-dun.vercel.app/)
+
 ## 🚀 Features
 
 ### ✅ Backend (Node.js + Express + MongoDB)

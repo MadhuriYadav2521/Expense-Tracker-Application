@@ -29,7 +29,6 @@ const BarsDataset = () => {
       const response = await FetchBarChartDataAxios();
       if (response.data.status == 200) {
         setLoading(false)
-        console.log(response.data, "piiiiiiiiiiiiiiiiiiiiiiiiiii");
 
         setBarChartData(response.data.barData)
       }

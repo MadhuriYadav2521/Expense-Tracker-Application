@@ -19,14 +19,12 @@ const Register = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    console.log("FormDAta:", formData);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             setLoading(true)
             const response = await RegisterAxios(formData)
-            console.log(response, "resss");
             if (response.data.success == true) {
                 setLoading(false)
                 setFormData({ name: "", email: "", password: "" })

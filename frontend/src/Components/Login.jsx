@@ -25,7 +25,6 @@ const Login = () => {
     try {
       setLoading(true)
       const response = await LoginAxios(formData)
-      console.log(response, "resss");
       if (response.data.success == true) {
         setLoading(false)
         setFormData({ email: "", password: "" })

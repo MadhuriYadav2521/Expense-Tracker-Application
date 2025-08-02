@@ -34,8 +34,6 @@ const UpdateTransactionDialog = ({ open, handleClose, data, clearFilters }) => {
         date: data.createdDate
     });
     const dispatch = useDispatch();
-    console.log(data, "ssssssssssssssss");
-    console.log(formData, "formDatappp");
     const [loading, setLoading] = useState(false)
 
     const handleChange = (e) => {
@@ -187,13 +185,11 @@ const UpdateTransactionDialog = ({ open, handleClose, data, clearFilters }) => {
 const FilterDialog = ({ open, handleClose, onSubmit }) => {
     const [formData, setFormData] = useState({ category: '', date: '', fromDate: '', toDate: '', transactionType: "" });
     const [dateMode, setDateMode] = useState('single');
-    const transactionTypes = ['income', 'expense']
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
-    console.log(formData, "dddddddddd");
 
 
     const handleSubmit = () => {
@@ -352,7 +348,6 @@ const ViewTransactions = () => {
 
 
     console.log(filters, "filters");
-    console.log(selectedIds, "selectedIdszzzzzzzzzzz");
 
 
 
@@ -390,7 +385,6 @@ const ViewTransactions = () => {
             }
         }
     };
-    console.log(transactionData, "transactionData");
 
     useEffect(() => {
         if (!filters || Object.keys(filters).length === 0) {
@@ -408,7 +402,6 @@ const ViewTransactions = () => {
     };
 
     const handleDeleteTransactions = async (data) => {
-        console.log(data, "mmmmmmmmmmmmmmmm");
         try {
             setLoading(true)
             const response = await DeleteTransactionsAxios({ selectedIds: data })
@@ -436,7 +429,14 @@ const ViewTransactions = () => {
     const handleFilterSubmit = async (allfilters) => {
         try {
             setLoading(true)
-            console.log(allfilters, "filtersssssssss");
+
+            const hasValidFilters = Object.values(allfilters).some((val) => val && val.trim() !== "");
+            if (!hasValidFilters) {
+                setLoading(false)
+                toast.error("Please select filters.");
+                return;
+            }
+            
             setFilters(allfilters)
             const response = await FetchTransactionsByFilterAxios(allfilters);
             if (response.data.success) {

@@ -40,7 +40,6 @@ const Navbar = () => {
         setUserData(response.data.userData)
 
         const initials = getInitials(response.data.userData.name);
-        console.log(response.data.userData.name,"aaaaaa");
         
         setUserInitials(initials);
       }

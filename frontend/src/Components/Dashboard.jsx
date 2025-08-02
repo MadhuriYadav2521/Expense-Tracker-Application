@@ -22,7 +22,6 @@ const Dashboard = () => {
     try {
       const response = await FetchChartDataAxios();
       if (response.data.status == 200) {
-        console.log(response.data, "ppppppppppppppppppppppppppppp");
         setPieChartData(response.data.pieData || [])
         setTotalBalance(response.data.totalBalance)
         setTotalExpense(response.data.totalExpense)
@@ -38,7 +37,6 @@ const Dashboard = () => {
     }
   };
 
-  console.log(isPieDataEmpty,"isPieDataEmpty");
   
 
   useEffect(() => {

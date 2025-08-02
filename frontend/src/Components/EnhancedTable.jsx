@@ -96,7 +96,7 @@ function EnhancedTableToolbar({ numSelected, deleteTransactions, selected, openF
                         <Tooltip title="Filter list" onClick={() => openFilter()}>
                             <IconButton><FilterAltIcon sx={{ color: '#FFBF00', fontSize: "24px" }} /></IconButton>
                         </Tooltip>
-                        {filters &&
+                        {filters && Object.keys(filters).length > 0 &&
                             <Tooltip title="Clear filter" onClick={() => clearFilters()}>
                                 <IconButton><FilterAltOffIcon sx={{ color: 'red', fontSize: "24px" }} /></IconButton>
                             </Tooltip>

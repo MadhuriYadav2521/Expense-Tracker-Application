@@ -5,14 +5,13 @@ import Login from './Components/Login'
 import Dashboard from './Components/Dashboard'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Navbar from './Components/Navbar'
 
 function App() {
 
   return (
     <>
       <BrowserRouter>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={4000} />
         <Routes>
           <Route path='/register' element={<Register />} />
           <Route path='/' element={<Login />} />
