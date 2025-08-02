@@ -1,4 +1,4 @@
-<img width="1722" height="1551" alt="image" src="https://github.com/user-attachments/assets/5769fe21-eb7e-4b31-9a9a-6b9f450994f3" /># 📊 Expense Tracker Application
+### 📊 Expense Tracker Application
 
 **Machine Test Project**  
 A full-stack Expense Tracker app that allows users to **add**, **view**, **filter**, and **manage** their income and expenses in a visually intuitive way.
