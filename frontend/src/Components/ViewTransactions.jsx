@@ -208,6 +208,9 @@ const FilterDialog = ({ open, handleClose, onSubmit }) => {
                 : { fromDate: updatedFormData.fromDate, toDate: updatedFormData.toDate })
         };
 
+        console.log(filtersToSubmit,"filtersToSubmitvvvvvvvvvvvvvvvv");
+        
+
         onSubmit(filtersToSubmit);
         // handleClose();
         setFormData({ category: '', date: '', fromDate: '', toDate: '', transactionType: '' });
@@ -342,9 +345,9 @@ const ViewTransactions = () => {
     const [filters, setFilters] = useState()
     const [loading, setLoading] = useState(false)
     const [clearSelectionCount, setClearSelectionCount] = useState(0);
-    const [resetTablePage, setResetTablePage] = useState(false);
+    const [resetTablePage, setResetTablePage] = useState(0);
 
-    const clearReset = () => setResetTablePage(false);
+    const clearReset = () => setResetTablePage(prev => prev + 1);
 
 
     console.log(filters, "filters");
@@ -388,16 +391,17 @@ const ViewTransactions = () => {
 
     useEffect(() => {
         if (!filters || Object.keys(filters).length === 0) {
-            getTransactions();
+            clearFilters()
         }
         if (transactionAdded) {
             dispatch(setTransactionAdded(false));
+            clearFilters()
         }
     }, [transactionAdded]);
 
     const clearFilters = () => {
         setFilters({});
-        setResetTablePage(true);
+        setResetTablePage(prev => prev + 1);
         getTransactions();
     };
 
@@ -450,12 +454,14 @@ const ViewTransactions = () => {
                     createdDate: new Date(item.createdDate).toLocaleDateString(),
                 }));
                 setTransactionData(formatted);
-                setResetTablePage(true);
+                setResetTablePage(prev => prev + 1);
                 setFilters(allfilters);
                 setOpenFilterModal(false)
                 toast.success(response.data.message);
             }
         } catch (error) {
+            setTransactionData([]); 
+            setOpenFilterModal(false)
             setLoading(false)
             console.log(error);
             if (error.response) {
@@ -465,6 +471,8 @@ const ViewTransactions = () => {
             }
         }
     }
+
+    
 
 
 

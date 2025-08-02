@@ -60,7 +60,7 @@ function EnhancedTableHead({ headCells, onSelectAllClick, order, orderBy, numSel
     );
 }
 
-function EnhancedTableToolbar({ numSelected, deleteTransactions, selected, openFilter, filters, clearFilters }) {
+function EnhancedTableToolbar({ numSelected, deleteTransactions, selected, openFilter, filters, clearFilters, hasData }) {
     console.log(filters, "filters from childddddddddd");
 
 
@@ -158,18 +158,20 @@ const EnhancedTable = ({ rows, headCells, onSelectionChange, deleteTransactions,
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    
 
     React.useEffect(() => {
-        if (resetTablePage) {
+        // if (resetTablePage) {
+            // alert("resettting0")
             setPage(0);
-        }
+        // }
     }, [resetTablePage]);
 
-    React.useEffect(() => {
-        if (resetTablePage && typeof clearReset === 'function') {
-            clearReset(); 
-        }
-    }, [resetTablePage]);
+    // React.useEffect(() => {
+    //     if (resetTablePage && typeof clearReset === 'function') {
+    //         clearReset(); 
+    //     }
+    // }, [resetTablePage]);
 
 
     React.useEffect(() => {
@@ -236,11 +238,11 @@ const EnhancedTable = ({ rows, headCells, onSelectionChange, deleteTransactions,
     }, [order, orderBy, page, rowsPerPage, rows]);
 
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
+    
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} deleteTransactions={deleteTransactions} selected={selected} openFilter={openFilter} filters={filters} clearFilters={clearFilters} />
+                <EnhancedTableToolbar numSelected={selected.length} deleteTransactions={deleteTransactions} selected={selected} openFilter={openFilter} filters={filters} clearFilters={clearFilters} hasData={rows.length > 0} />
                 <TableContainer>
                     <Table size={dense ? 'small' : 'medium'}>
                         <EnhancedTableHead

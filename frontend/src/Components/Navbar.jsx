@@ -120,7 +120,7 @@ const Navbar = () => {
                 {userData?.email}
               </Typography>
             </Box>
-            <MenuItem sx={{ mt: 1 }} onClick={()=> handleLogout()}>Logout</MenuItem>
+            <MenuItem sx={{ mt: 1 }} onClick={()=> handleLogout()}>Sign Out</MenuItem>
           </Menu>
 
         </Box>
