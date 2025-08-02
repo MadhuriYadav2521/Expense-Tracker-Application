@@ -1,4 +1,4 @@
-### 📊 Expense Tracker Application
+# H1 📊 Expense Tracker Application
 
 **Machine Test Project**  
 A full-stack Expense Tracker app that allows users to **add**, **view**, **filter**, and **manage** their income and expenses in a visually intuitive way.
