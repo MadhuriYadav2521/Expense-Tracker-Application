@@ -150,7 +150,7 @@ function EnhancedTableToolbar({ numSelected, deleteTransactions, selected, openF
     );
 }
 
-const EnhancedTable = ({ rows, headCells, onSelectionChange, deleteTransactions, onEdit, openFilter, filters, clearFilters, clearSelectionCount }) => {
+const EnhancedTable = ({ rows, headCells, onSelectionChange, deleteTransactions, onEdit, openFilter, filters, clearFilters, clearSelectionCount, resetTablePage, clearReset }) => {
 
     const [order, setOrder] = React.useState(null);
     const [orderBy, setOrderBy] = React.useState(headCells[0]?.id || '');
@@ -158,6 +158,18 @@ const EnhancedTable = ({ rows, headCells, onSelectionChange, deleteTransactions,
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+    React.useEffect(() => {
+        if (resetTablePage) {
+            setPage(0);
+        }
+    }, [resetTablePage]);
+
+    React.useEffect(() => {
+        if (resetTablePage && typeof clearReset === 'function') {
+            clearReset(); 
+        }
+    }, [resetTablePage]);
 
 
     React.useEffect(() => {

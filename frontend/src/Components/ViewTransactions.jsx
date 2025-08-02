@@ -213,7 +213,7 @@ const FilterDialog = ({ open, handleClose, onSubmit }) => {
         };
 
         onSubmit(filtersToSubmit);
-        handleClose();
+        // handleClose();
         setFormData({ category: '', date: '', fromDate: '', toDate: '', transactionType: '' });
         setDateMode('single');
     };
@@ -346,6 +346,9 @@ const ViewTransactions = () => {
     const [filters, setFilters] = useState()
     const [loading, setLoading] = useState(false)
     const [clearSelectionCount, setClearSelectionCount] = useState(0);
+    const [resetTablePage, setResetTablePage] = useState(false);
+
+    const clearReset = () => setResetTablePage(false);
 
 
     console.log(filters, "filters");
@@ -400,6 +403,7 @@ const ViewTransactions = () => {
 
     const clearFilters = () => {
         setFilters({});
+        setResetTablePage(true);
         getTransactions();
     };
 
@@ -446,6 +450,9 @@ const ViewTransactions = () => {
                     createdDate: new Date(item.createdDate).toLocaleDateString(),
                 }));
                 setTransactionData(formatted);
+                setResetTablePage(true);
+                setFilters(allfilters);
+                setOpenFilterModal(false)
                 toast.success(response.data.message);
             }
         } catch (error) {
@@ -477,6 +484,8 @@ const ViewTransactions = () => {
                 filters={filters}
                 clearFilters={() => clearFilters()}
                 clearSelectionCount={clearSelectionCount}
+                resetTablePage={resetTablePage}
+                clearReset={clearReset}
             />
 
 
