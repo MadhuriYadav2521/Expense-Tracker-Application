@@ -126,23 +126,6 @@ const UpdateTransactionDialog = ({ open, handleClose, data, clearFilters }) => {
                         </TextField>
 
                         <TextField
-                            label="Amount"
-                            name="amount"
-                            type="number"
-                            value={formData.amount}
-                            onChange={handleChange}
-                            fullWidth
-                        />
-
-                        <TextField
-                            label="Description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            fullWidth
-                        />
-
-                        <TextField
                             select
                             label="Category"
                             name="category"
@@ -159,6 +142,23 @@ const UpdateTransactionDialog = ({ open, handleClose, data, clearFilters }) => {
                                 </MenuItem>
                             ))}
                         </TextField>
+
+                        <TextField
+                            label="Description"
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            fullWidth
+                        />
+
+                        <TextField
+                            label="Amount"
+                            name="amount"
+                            type="number"
+                            value={formData.amount}
+                            onChange={handleChange}
+                            fullWidth
+                        />
 
                         <TextField
                             label="Date"
@@ -345,9 +345,12 @@ const ViewTransactions = () => {
     const [openFilterModal, setOpenFilterModal] = useState(false)
     const [filters, setFilters] = useState()
     const [loading, setLoading] = useState(false)
+    const [clearSelectionCount, setClearSelectionCount] = useState(0);
 
 
     console.log(filters, "filters");
+    console.log(selectedIds, "selectedIdszzzzzzzzzzz");
+
 
 
     const headCells = [
@@ -404,11 +407,14 @@ const ViewTransactions = () => {
         console.log(data, "mmmmmmmmmmmmmmmm");
         try {
             setLoading(true)
-            const response = await DeleteTransactionsAxios({ selectedIds: data });
+            const response = await DeleteTransactionsAxios({ selectedIds: data })
             if (response.data.success) {
                 setLoading(false)
-                dispatch(setTransactionAdded(true));
-                toast.success(response.data.message);
+                dispatch(setTransactionAdded(true))
+                setSelectedIds([])
+                setClearSelectionCount(prev => prev + 1);
+                clearFilters()
+                toast.success(response.data.message)
             }
         } catch (error) {
             setLoading(false)
@@ -470,6 +476,7 @@ const ViewTransactions = () => {
                 openFilter={() => setOpenFilterModal(true)}
                 filters={filters}
                 clearFilters={() => clearFilters()}
+                clearSelectionCount={clearSelectionCount}
             />
 
 

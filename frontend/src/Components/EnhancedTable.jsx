@@ -63,6 +63,7 @@ function EnhancedTableHead({ headCells, onSelectAllClick, order, orderBy, numSel
 function EnhancedTableToolbar({ numSelected, deleteTransactions, selected, openFilter, filters, clearFilters }) {
     console.log(filters, "filters from childddddddddd");
 
+
     return (
         <>
             <Toolbar
@@ -149,7 +150,7 @@ function EnhancedTableToolbar({ numSelected, deleteTransactions, selected, openF
     );
 }
 
-const EnhancedTable = ({ rows, headCells, onSelectionChange, deleteTransactions, onEdit, openFilter, filters, clearFilters }) => {
+const EnhancedTable = ({ rows, headCells, onSelectionChange, deleteTransactions, onEdit, openFilter, filters, clearFilters, clearSelectionCount }) => {
 
     const [order, setOrder] = React.useState(null);
     const [orderBy, setOrderBy] = React.useState(headCells[0]?.id || '');
@@ -157,6 +158,11 @@ const EnhancedTable = ({ rows, headCells, onSelectionChange, deleteTransactions,
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+
+    React.useEffect(() => {
+        setSelected([]);
+    }, [clearSelectionCount]);
 
     React.useEffect(() => {
         if (onSelectionChange) {

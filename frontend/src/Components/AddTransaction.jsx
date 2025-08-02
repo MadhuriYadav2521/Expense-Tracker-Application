@@ -98,31 +98,6 @@ const AddTransaction = () => {
 
                     <Grid item xs={12} sm={2}>
                         <Box sx={{ minWidth: 165, width: "100%" }}>
-                            <TextField
-                                fullWidth
-                                name="amount"
-                                label="Amount"
-                                type="number"
-                                value={form.amount}
-                                onChange={handleChange}
-                            />
-                        </Box>
-                    </Grid>
-
-                    <Grid item xs={12} sm={2.5}>
-                        <Box sx={{ minWidth: 165, width: "100%" }}>
-                            <TextField
-                                fullWidth
-                                name="description"
-                                label="Description"
-                                value={form.description}
-                                onChange={handleChange}
-                            />
-                        </Box>
-                    </Grid>
-
-                    <Grid item xs={12} sm={2}>
-                        <Box sx={{ minWidth: 165, width: "100%" }}>
                             <FormControl fullWidth >
                                 <InputLabel>Category</InputLabel>
                                 <Select
@@ -149,6 +124,32 @@ const AddTransaction = () => {
                             </FormControl>
                         </Box>
                     </Grid>
+
+                    <Grid item xs={12} sm={2.5}>
+                        <Box sx={{ minWidth: 165, width: "100%" }}>
+                            <TextField
+                                fullWidth
+                                name="description"
+                                label="Description"
+                                value={form.description}
+                                onChange={handleChange}
+                            />
+                        </Box>
+                    </Grid>
+
+                    <Grid item xs={12} sm={2}>
+                        <Box sx={{ minWidth: 165, width: "100%" }}>
+                            <TextField
+                                fullWidth
+                                name="amount"
+                                label="Amount"
+                                type="number"
+                                value={form.amount}
+                                onChange={handleChange}
+                            />
+                        </Box>
+                    </Grid>
+
 
                     <Grid item xs={12} sm={2}>
                         <Box sx={{ minWidth: 165, width: "100%" }}>
