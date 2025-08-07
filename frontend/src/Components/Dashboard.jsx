@@ -54,7 +54,7 @@ const Dashboard = () => {
         justifyContent="space-between"
         alignItems="flex-start"
         flexWrap="wrap"
-        px={6}
+        px={{ xs: 1, md: 6 }}
         py={4}
         gap={4}
         width="100%"
@@ -109,7 +109,7 @@ const Dashboard = () => {
       </Box>
 
       {/* Add Transaction Section */}
-      <Box px={6} py={4} pt={0}>
+      <Box px={{ xs: 1, md: 6 }} py={4} pt={0}>
         <Paper elevation={3} sx={{ p: 4, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', }}>
           <AddTransaction />
         </Paper>
@@ -117,7 +117,7 @@ const Dashboard = () => {
 
 
       {/* View Transaction Section */}
-      <Box px={6} py={4} pt={0}>
+      <Box px={{ xs: 1, md: 6 }} py={4} pt={0}>
         <Paper elevation={3} sx={{ p: 4, borderRadius: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', }}>
           <ViewTransactions />
         </Paper>
