@@ -5,6 +5,8 @@ import PDFDocument from "pdfkit";
 import getStream from "get-stream";
 import { PassThrough } from "stream";
 import fs from "fs"
+import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
+
 
 export const addTransaction = async (req, res) => {
     try {
@@ -281,6 +283,98 @@ function capitalizeName(str) {
         .join(" ");
 }
 
+
+const height = 300;
+const width = 600;
+
+
+const canvasRenderService = new ChartJSNodeCanvas({ width, height });
+
+export const generateChartImage = async (transactions) => {
+    const monthMap = {};
+
+    const summary = {
+        income: 0,
+        expense: 0,
+    };
+
+    transactions.forEach((tx) => {
+        const date = new Date(tx.createdDate);
+        const month = date.toLocaleString('default', { month: 'short' });
+
+        if (!monthMap[month]) {
+            monthMap[month] = { income: 0, expense: 0 };
+        }
+
+        if (tx.transactionType === 'income') {
+            monthMap[month].income += tx.amount;
+            summary.income += tx.amount;
+        } else {
+            monthMap[month].expense += tx.amount;
+            summary.expense += tx.amount;
+        }
+    });
+
+    const MONTH_ORDER = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = MONTH_ORDER.filter((m) => monthMap[m]);
+    const incomeData = months.map((m) => monthMap[m].income);
+    const expenseData = months.map((m) => monthMap[m].expense);
+
+    const configuration = {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Income',
+                    backgroundColor: '#3b82f6',
+                    data: incomeData,
+                },
+                {
+                    label: 'Expense',
+                    backgroundColor: '#facc15',
+                    data: expenseData,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Monthly Income vs Expense',
+                },
+            },
+        },
+    };
+
+    const pieConfiguration = {
+        type: 'pie',
+        data: {
+            labels: ['Income', 'Expense'],
+            datasets: [{
+                data: [summary.income, summary.expense],
+                backgroundColor: ['#3b82f6', '#facc15'],
+            }],
+        },
+        options: {
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Income vs Expense (Pie)',
+                },
+            },
+        },
+    };
+
+    const barBuffer = await canvasRenderService.renderToBuffer(configuration);
+    const pieBuffer = await canvasRenderService.renderToBuffer(pieConfiguration);
+
+    return { barBuffer, pieBuffer, summary };
+};
+
+
+
 export const getTransactionReport = async (req, res) => {
     try {
         const { month, fromDate, date, toDate, transactionType, category } = req.query;
@@ -315,6 +409,8 @@ export const getTransactionReport = async (req, res) => {
         if (category) filter.category = category;
 
         const transactions = await Transactions.find(filter).sort({ _id: -1 });
+        const { barBuffer, pieBuffer, summary } = await generateChartImage(transactions);
+        const totalBalance = summary.income - summary.expense;
 
         const fileName = `transaction-report-${Date.now()}.pdf`;
         res.setHeader("Content-Type", "application/pdf");
@@ -354,7 +450,36 @@ export const getTransactionReport = async (req, res) => {
             .text("Applied Filters:")
             .moveDown(0.2)
             .text(filterText)
-            .moveDown(1);
+            .moveDown(3);
+
+        // 3️⃣ Display Totals aligned to the LEFT
+        doc
+            .fontSize(11)
+            .font("Helvetica-Bold")
+            .fillColor("#34495e")
+            .text(`Total Balance:  ${totalBalance}`);
+
+        doc
+            .fontSize(10)
+            .font("Helvetica")
+            .fillColor("green")
+            .text(`Total Income:  ${summary.income}`);
+
+        doc
+            .fillColor("red")
+            .text(`Total Expense:  ${summary.expense}`);
+
+        // 4️⃣ Add space before next section (chart or table)
+        doc.moveDown(2);
+
+
+        // ✅ Step 1: Generate and insert chart before table
+
+        // Show both side-by-side
+        doc.image(barBuffer, 50, doc.y, { fit: [250, 250] });
+        doc.image(pieBuffer, 320, doc.y, { fit: [250, 250] });
+
+        doc.moveDown(13); // space below chart
 
         const tableTop = doc.y + 10;
         const startX = 50;

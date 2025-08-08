@@ -1,7 +1,7 @@
 #  📊 Expense Tracker Application
 
 **Machine Test Project**  
-A full-stack Expense Tracker app that allows users to **add**, **view**, **delete**, **filter**, and **manage** their income and expenses in a visually intuitive way.
+A full-stack Expense Tracker app that allows users to **add**, **view**, **delete**, **filter**, and **manage** their income and expenses in a visually intuitive way and download transaction reports.
 
 ## 🧾 Objective
 Build a user-friendly application with a RESTful backend and dynamic frontend UI to track and analyze financial transactions.
