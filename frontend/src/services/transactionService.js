@@ -109,3 +109,23 @@ export const FetchBarChartDataAxios = async (data) => {
         throw error;
     }
 };
+
+export const GeneratePdfReportAxios = async (filters) => {
+    try {
+        const jwtToken = localStorage.getItem("jwtToken");
+        const params = new URLSearchParams(filters).toString();
+
+        const response = await axios.get(`${BASE_URL}/getTransactionReport?${params}`, {
+            // params: filters, 
+            headers: {
+                Authorization: `Bearer ${jwtToken}`,
+            },
+            responseType: "blob", // very important for PDF
+        });
+
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+

@@ -48,6 +48,10 @@ const AddTransaction = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            if (!form.transactionType || !form.amount || !form.description || !form.category || !form.date) {
+                toast.error("Please fill all the fields.")
+                return
+            }
             setLoading(true)
             const response = await AddTransactionAxios(form)
             if (response.data.success == true) {

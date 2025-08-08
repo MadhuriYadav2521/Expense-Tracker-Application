@@ -115,7 +115,7 @@ const Navbar = () => {
             }}
           >
             <Box px={2} pt={1}>
-              <Typography fontWeight="bold">{userData?.name}</Typography>
+              <Typography fontWeight="bold" sx={{textTransform: "capitalize"}}>{userData?.name}</Typography>
               <Typography variant="body2" color="text.secondary">
                 {userData?.email}
               </Typography>

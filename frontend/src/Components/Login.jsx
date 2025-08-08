@@ -23,6 +23,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!formData.email || !formData.password) {
+        toast.error("Please fill all the fields.")
+        return
+      }
       setLoading(true)
       const response = await LoginAxios(formData)
       if (response.data.success == true) {

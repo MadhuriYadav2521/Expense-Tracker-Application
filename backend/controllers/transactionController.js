@@ -1,6 +1,10 @@
 import Transactions from "../models/transactionsModel.js";
 import mongoose from "mongoose";
 import moment from 'moment';
+import PDFDocument from "pdfkit";
+import getStream from "get-stream";
+import { PassThrough } from "stream";
+import fs from "fs"
 
 export const addTransaction = async (req, res) => {
     try {
@@ -86,7 +90,6 @@ export const fetchTotalBalance = async (req, res) => {
     }
 }
 
-
 export const getTransactionsByFilter = async (req, res) => {
     try {
         const { transactionType, date, category, fromDate, toDate } = req.query;
@@ -119,7 +122,7 @@ export const getTransactionsByFilter = async (req, res) => {
         console.log(filter, "filter");
 
 
-        const transactions = await Transactions.find(filter).sort({ createdDate: -1 });
+        const transactions = await Transactions.find(filter).sort({ _id: -1 });
 
         if (transactions.length == 0) return res.status(400).json({ status: 400, message: "No transactions found for the given filters.", success: false })
 
@@ -130,7 +133,6 @@ export const getTransactionsByFilter = async (req, res) => {
         res.status(500).json({ status: 500, message: "Internal server error", success: false });
     }
 };
-
 
 export const deleteTransactions = async (req, res) => {
     try {
@@ -187,8 +189,6 @@ export const updateTransactions = async (req, res) => {
     }
 };
 
-
-
 export const fetchBarChartData = async (req, res) => {
     try {
         const userId = req.userData.id;
@@ -236,3 +236,211 @@ export const fetchBarChartData = async (req, res) => {
         });
     }
 };
+
+
+function formatFilters(filters) {
+    if (!filters || Object.keys(filters).length === 0) return "None";
+
+    const parts = [];
+
+    if (filters.transactionType && filters.transactionType !== "All") {
+        parts.push(`Transaction Type: ${capitalize(filters.transactionType)}`);
+    }
+
+    if (filters.category && filters.category !== "All") {
+        parts.push(`Category: ${capitalize(filters.category)}`);
+    }
+
+    const dateFilter = filters.createdDate;
+    if (dateFilter?.$gte && dateFilter?.$lte) {
+        const from = new Date(dateFilter.$gte).toLocaleDateString("en-GB");
+        const to = new Date(dateFilter.$lte).toLocaleDateString("en-GB");
+        parts.push(`Date Range: ${from} to ${to}`);
+    } else if (dateFilter?.$gte) {
+        const from = new Date(dateFilter.$gte).toLocaleDateString("en-GB");
+        parts.push(`From: ${from}`);
+    } else if (dateFilter?.$lte) {
+        const to = new Date(dateFilter.$lte).toLocaleDateString("en-GB");
+        parts.push(`Up to: ${to}`);
+    }
+
+    return parts.length > 0 ? parts.join(", ") : "None";
+}
+
+function capitalize(str) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+function capitalizeName(str) {
+    if (!str) return "";
+    return str
+        .toLowerCase()
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
+
+export const getTransactionReport = async (req, res) => {
+    try {
+        const { month, fromDate, date, toDate, transactionType, category } = req.query;
+        const userData = req.userData;
+        const userId = userData.id;
+        const filter = { userId };
+
+        if (month) {
+            const startOfMonth = new Date(`${month}-01`);
+            const endOfMonth = new Date(startOfMonth);
+            endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+            filter.createdDate = { $gte: startOfMonth, $lt: endOfMonth };
+        }
+        if (date) {
+            const start = new Date(date);
+            const end = new Date(date);
+            end.setHours(23, 59, 59, 999);
+            filter.createdDate = { $gte: start, $lte: end };
+        }
+        if (fromDate && toDate) {
+            filter.createdDate = {
+                $gte: new Date(fromDate),
+                $lte: new Date(toDate),
+            };
+        } else if (fromDate) {
+            filter.createdDate = { $gte: new Date(fromDate) };
+        } else if (toDate) {
+            filter.createdDate = { $lte: new Date(toDate) };
+        }
+
+        if (transactionType) filter.transactionType = transactionType;
+        if (category) filter.category = category;
+
+        const transactions = await Transactions.find(filter).sort({ _id: -1 });
+
+        const fileName = `transaction-report-${Date.now()}.pdf`;
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
+
+        const doc = new PDFDocument({ margin: 50 });
+        doc.pipe(res);
+
+        const gradient = doc.linearGradient(0, 0, doc.page.width, 0);
+        gradient.stop(0, '#f43f5e').stop(0.5, '#db2777').stop(1, '#ef4444');
+
+        doc.rect(0, 0, doc.page.width, 30).fill(gradient);
+
+        doc
+            .fillColor("#ffffff")
+            .fontSize(14)
+            .font("Helvetica-Bold")
+            .text("Expense Tracker", 50, 8);
+
+        doc
+            .moveDown(2)
+            .fillColor("#2c3e50")
+            .fontSize(20)
+            .text("Transaction Report", { align: "center" });
+
+        const fullName = capitalizeName(userData?.name || "N/A");
+        doc
+            .moveDown()
+            .fontSize(12)
+            .fillColor("#2c3e50")
+            .text(`${fullName} (${userData?.email || "N/A"})`);
+
+        const filterText = formatFilters(filter);
+        doc
+            .fontSize(10)
+            .fillColor("#7f8c8d")
+            .text("Applied Filters:")
+            .moveDown(0.2)
+            .text(filterText)
+            .moveDown(1);
+
+        const tableTop = doc.y + 10;
+        const startX = 50;
+        const rowHeight = 20;
+        const headers = ["Sr. No.", "Date", "Category", "Amount", "Type", "Description"];
+        const colWidths = [60, 80, 100, 80, 80, 130];
+
+        const colX = (index) => colWidths.slice(0, index).reduce((a, b) => a + b, startX);
+
+        function drawTableHeader(yPos) {
+            headers.forEach((header, i) => {
+                const x = colX(i);
+                doc
+                    .rect(x, yPos, colWidths[i], rowHeight)
+                    .fill('#2c3e50')
+                    .stroke();
+
+                doc
+                    .fillColor("#ffffff")
+                    .font("Helvetica-Bold")
+                    .fontSize(10)
+                    .text(header, x + 5, yPos + 5, {
+                        width: colWidths[i] - 10,
+                        align: 'left'
+                    });
+            });
+        }
+
+        function drawTableRow(yPos, values, isOdd) {
+            values.forEach((val, i) => {
+                const x = colX(i);
+                doc
+                    .rect(x, yPos, colWidths[i], rowHeight)
+                    .fill(isOdd ? '#f9f9f9' : '#ffffff')
+                    .stroke();
+
+                doc
+                    .fillColor("#2c3e50")
+                    .font("Helvetica")
+                    .fontSize(10)
+                    .text(val.toString(), x + 5, yPos + 5, {
+                        width: colWidths[i] - 10,
+                        align: 'left'
+                    });
+            });
+        }
+
+        let y = tableTop;
+        drawTableHeader(y);
+        y += rowHeight;
+
+        transactions.forEach((txn, index) => {
+            const values = [
+                index + 1,
+                moment(txn.createdDate).format("DD/MM/YYYY"),
+                txn.category,
+                txn.amount,
+                capitalizeName(txn.transactionType),
+                capitalizeName(txn.description || "")
+            ];
+
+            if (y + rowHeight > doc.page.height - 50) {
+                doc.addPage();
+                y = 50;
+                drawTableHeader(y);
+                y += rowHeight;
+            }
+
+            drawTableRow(y, values, index % 2 === 0);
+            y += rowHeight;
+        });
+
+        doc.moveDown(2)
+            .fontSize(10)
+            .fillColor("#7f8c8d")
+            .text("Generated by Expense Tracker", { align: "center" });
+
+        doc.end();
+
+    } catch (error) {
+        console.error("Error generating report:", error);
+        res.status(500).json({ message: "Error generating report" });
+    }
+};
+
+
+
+
+

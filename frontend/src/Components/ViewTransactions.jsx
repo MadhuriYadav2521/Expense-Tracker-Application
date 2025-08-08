@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import EnhancedTable from './EnhancedTable';
-import { DeleteTransactionsAxios, FetchTransactionsByFilterAxios, UpdateTransactionsAxios, ViewTransactionAxios } from '../services/transactionService';
+import { DeleteTransactionsAxios, FetchTransactionsByFilterAxios, GeneratePdfReportAxios, UpdateTransactionsAxios, ViewTransactionAxios } from '../services/transactionService';
 import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux';
 import { setTransactionAdded } from '../Redux/transactionSlice';
@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Loader from "./Loader"
+import axios from 'axios';
 
 
 const incomeCategories = ["Salary", "Interest", "Freelance", "Bonus", "Investments", "Rental Income"];
@@ -208,8 +209,8 @@ const FilterDialog = ({ open, handleClose, onSubmit }) => {
                 : { fromDate: updatedFormData.fromDate, toDate: updatedFormData.toDate })
         };
 
-        console.log(filtersToSubmit,"filtersToSubmitvvvvvvvvvvvvvvvv");
-        
+        console.log(filtersToSubmit, "filtersToSubmitvvvvvvvvvvvvvvvv");
+
 
         onSubmit(filtersToSubmit);
         // handleClose();
@@ -350,7 +351,7 @@ const ViewTransactions = () => {
     const clearReset = () => setResetTablePage(prev => prev + 1);
 
 
-    console.log(filters, "filters");
+    console.log(filters, "filterszzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
 
 
 
@@ -440,7 +441,7 @@ const ViewTransactions = () => {
                 toast.error("Please select filters.");
                 return;
             }
-            
+
             setFilters(allfilters)
             const response = await FetchTransactionsByFilterAxios(allfilters);
             if (response.data.success) {
@@ -460,7 +461,7 @@ const ViewTransactions = () => {
                 toast.success(response.data.message);
             }
         } catch (error) {
-            setTransactionData([]); 
+            setTransactionData([]);
             setOpenFilterModal(false)
             setLoading(false)
             console.log(error);
@@ -472,7 +473,25 @@ const ViewTransactions = () => {
         }
     }
 
-    
+
+    const downloadReport = async () => {
+        try {
+            const res = await GeneratePdfReportAxios(filters);
+
+            // Create PDF download link
+            const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "report.pdf";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error downloading report:", error);
+        }
+    };
+
 
 
 
@@ -494,6 +513,7 @@ const ViewTransactions = () => {
                 clearSelectionCount={clearSelectionCount}
                 resetTablePage={resetTablePage}
                 clearReset={clearReset}
+                downloadReport={downloadReport}
             />
 
 

@@ -23,6 +23,14 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            if (!formData.name || !formData.email || !formData.password) {
+                toast.error("Please fill all the fields.")
+                return
+            }
+            if (formData.password.length < 5) {
+                toast.error('Password must be at least 5 characters long.')
+                return
+            }
             setLoading(true)
             const response = await RegisterAxios(formData)
             if (response.data.success == true) {
